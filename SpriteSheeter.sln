@@ -1,11 +1,14 @@
-
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpriteSheeter.Core", "SpriteSheeter.Core\SpriteSheeter.Core.csproj", "{20C53C76-406F-446B-93CC-902760DCDA2F}"
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29905.134
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SpriteSheeter.Core", "SpriteSheeter.Core\SpriteSheeter.Core.csproj", "{20C53C76-406F-446B-93CC-902760DCDA2F}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Sprite Sheeter", "Sprite Sheeter", "{FE2DA9EF-C96F-446E-8445-86053CA07D50}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "1. Sprite Sheeter", "1. Sprite Sheeter", "{FE2DA9EF-C96F-446E-8445-86053CA07D50}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpriteSheeter.Console", "SpriteSheeter.Console\SpriteSheeter.Console.csproj", "{2947F854-981D-4F42-BF3E-5B86D8968989}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SpriteSheeter.Console", "SpriteSheeter.Console\SpriteSheeter.Console.csproj", "{2947F854-981D-4F42-BF3E-5B86D8968989}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "2. Libraries", "2. Libraries", "{4AF275F9-5067-4F6D-B827-FEFA2DDA3DFF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -22,15 +25,21 @@ Global
 		{2947F854-981D-4F42-BF3E-5B86D8968989}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2947F854-981D-4F42-BF3E-5B86D8968989}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{20C53C76-406F-446B-93CC-902760DCDA2F} = {FE2DA9EF-C96F-446E-8445-86053CA07D50}
 		{2947F854-981D-4F42-BF3E-5B86D8968989} = {FE2DA9EF-C96F-446E-8445-86053CA07D50}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {DB73C19A-3518-4396-B8FB-A589D410361A}
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
 		Policies = $0
 		$0.DotNetNamingPolicy = $1
 		$1.DirectoryNamespaceAssociation = PrefixedHierarchical
-		$0.TextStylePolicy = $2
+		$0.TextStylePolicy = $5
 		$2.FileWidth = 80
 		$2.scope = text/x-csharp
 		$0.CSharpFormattingPolicy = $3
@@ -38,11 +47,9 @@ Global
 		$3.SpaceAfterMethodCallName = True
 		$3.SpaceAfterCast = True
 		$3.scope = text/x-csharp
-		$0.TextStylePolicy = $4
 		$4.FileWidth = 80
 		$4.TabsToSpaces = True
 		$4.scope = text/plain
-		$0.TextStylePolicy = $5
 		$5.inheritsSet = null
 		$5.scope = application/t4-template
 	EndGlobalSection

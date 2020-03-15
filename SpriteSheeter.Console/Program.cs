@@ -62,10 +62,13 @@ namespace SpriteSheeter
 
 			using (Image generated = spriteSheet.GenerateSpriteSheet ())
 			{
-				using (Stream outputStream = new FileStream (Path.Combine (outputDir, $"{outputFilename}.png"), FileMode.Create))
+				generated.Save (Path.Combine (outputDir, $"{outputFilename}.png"), new SixLabors.ImageSharp.Formats.Png.PngEncoder ()
 				{
-					generated.SaveAsPng (outputStream);
-				}
+					BitDepth = SixLabors.ImageSharp.Formats.Png.PngBitDepth.Bit8,
+					ColorType = SixLabors.ImageSharp.Formats.Png.PngColorType.RgbWithAlpha,
+					FilterMethod = SixLabors.ImageSharp.Formats.Png.PngFilterMethod.Adaptive,
+					InterlaceMethod = SixLabors.ImageSharp.Formats.Png.PngInterlaceMode.None,
+				});
 			}
 
 			using (Stream outputStream = new FileStream (Path.Combine (outputDir, $"{outputFilename}.json"), FileMode.Create))
@@ -79,8 +82,9 @@ namespace SpriteSheeter
 						var sprite = spriteSheet.Sprites[filename];
 						var size = new System.Drawing.Size (sprite.Width, sprite.Height);
 						Console.WriteLine ($"INFO: {filename}: {new System.Drawing.Rectangle (position, size)}");
-						writer.WriteLine ($"\t\"{filename}\" : \"{position.X},{position.Y},{size.Width},{size.Height}\"");
+						writer.WriteLine ($"\t\"{filename}\" : \"{position.X},{position.Y},{size.Width},{size.Height}\"{((filename != spriteSheet.Filenames[spriteSheet.Filenames.Count - 1]) ? "," : "")}");
 					}
+
 					writer.WriteLine ("}");
 					writer.Flush ();
 				}

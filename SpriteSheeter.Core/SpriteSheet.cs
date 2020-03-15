@@ -33,6 +33,8 @@ namespace SpriteSheeter
             }
         }
 
+        public int CurrentSize { get; private set; } = 128;
+
 		public SpriteSheet ()
 		{
 
@@ -87,6 +89,11 @@ namespace SpriteSheeter
 
         private void Refresh ()
         {
+            Refresh (128);
+        }
+
+        private void Refresh (int targetSize)
+        {
             int currentHorizontal = 0, currentVertical = 0;
             int currentMaximumHeight = 0;
 
@@ -94,45 +101,50 @@ namespace SpriteSheeter
             {
                 int nextHorizontal = currentHorizontal + sprite.Value.Width;
 
-				if(nextHorizontal > maximumSize)
+                if (nextHorizontal > targetSize)
                 {
                     currentHorizontal = 0;
                     int nextVertical = currentVertical + currentMaximumHeight;
-                    if (nextVertical > maximumSize)
+                    if (nextVertical > targetSize)
                     {
-                        positions[sprite.Key] = new System.Drawing.Point (-1, -1);
-                        break;
+                        if (targetSize != MaximumSize)
+                        {
+                            Refresh (targetSize * 2);
+                            return;
+                        }
+                        positions [sprite.Key] = new System.Drawing.Point (-1, -1);
+                        continue;
                     }
                     currentVertical = nextVertical;
                     currentMaximumHeight = sprite.Value.Height;
-				}
+                }
 
-                positions[sprite.Key] = new System.Drawing.Point (currentHorizontal, currentVertical);
+                positions [sprite.Key] = new System.Drawing.Point (currentHorizontal, currentVertical);
                 currentMaximumHeight = (int) Math.Max (currentMaximumHeight, sprite.Value.Height);
 
                 currentHorizontal = nextHorizontal;
             }
+
+            CurrentSize = targetSize;
         }
 
 		public Image GenerateSpriteSheet ()
 		{
-            Rgba32[] pixels = new Rgba32[maximumSize * maximumSize];
-			foreach (var filename in filenames)
-			{
-                var sprite = sprites[filename];
-                var position = positions[filename];
+            Image<Rgba32> spriteSheet = new Image<Rgba32> (CurrentSize, CurrentSize);
+
+            foreach (var filename in filenames)
+            {
+                var sprite = sprites [filename];
+                var position = positions [filename];
 
                 for (int y = 0; y < sprite.Height; ++y)
                 {
                     for (int x = 0; x < sprite.Width; ++x)
                     {
-                        pixels[(y + position.Y) * maximumSize + (x + position.X)] = sprite[x, y];
+                        spriteSheet [x + position.X, y + position.Y] = sprite [x, y];
                     }
                 }
-			}
-
-            Memory<Rgba32> pixelsMemory = new Memory<Rgba32> ();
-            Image spriteSheet = Image.WrapMemory<Rgba32> (pixelsMemory, maximumSize, maximumSize);
+            }
 
             return spriteSheet;
 		}
