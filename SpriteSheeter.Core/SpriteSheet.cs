@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Linq;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
@@ -12,141 +13,184 @@ using SixLabors.ImageSharp.ColorSpaces;
 
 namespace SpriteSheeter
 {
-    public class SpriteSheet
-    {
-        int maximumSize = 4096;
-        List<string> filenames = new List<string> ();
-        Dictionary<string, Image<Rgba32>> sprites = new Dictionary<string, Image<Rgba32>> ();
-        Dictionary<string, System.Drawing.Point> positions = new Dictionary<string, System.Drawing.Point> ();
+	public class SheetItem
+	{
+		public string Name;
+		public Image<Rgba32> Sprite;
+		public Rectangle SheetArea;
 
-        public IReadOnlyList<string> Filenames => filenames;
-        public IReadOnlyDictionary<string, Image<Rgba32>> Sprites => sprites;
-        public IReadOnlyDictionary<string, System.Drawing.Point> Positions => positions;
+		public SheetItem (string path)
+		{
+			Set (path);
+		}
 
-        public int MaximumSize
-        {
-            get => maximumSize;
-            set
-            {
-                maximumSize = value;
-                Refresh ();
-            }
-        }
+		public void Set (string path)
+		{
+			Name = System.IO.Path.GetFileName (path);
+			Sprite = SixLabors.ImageSharp.Image.Load<Rgba32> (path);
+			ResetArea ();
+		}
 
-        public int CurrentSize { get; private set; } = 128;
+		public void ResetArea ()
+		{
+			SheetArea = new Rectangle (-1, -1, Sprite.Width, Sprite.Height);
+		}
+	}
+
+	public class SpriteSheet
+	{
+		int maximumSize = 4096;
+		List<SheetItem> items = new List<SheetItem> ();
+
+		public IReadOnlyList<SheetItem> Items => items;
+
+		public int MaximumSize
+		{
+			get => maximumSize;
+			set
+			{
+				maximumSize = value;
+				Refresh ();
+			}
+		}
+
+		public int CurrentSize { get; private set; } = 128;
 
 		public SpriteSheet ()
 		{
 
 		}
 
-        public string AddSprite (string filepath)
-        {
-            string filename = System.IO.Path.GetFileName (filepath);
-
-            Image<Rgba32> image = Image.Load<Rgba32> (filepath);
-            filenames.Add (filename);
-            sprites.Add (filename, image);
-            positions.Add (filename, new System.Drawing.Point (-1, -1));
-
-            Refresh ();
-            return filename;
-        }
-
-        public void ReplaceSprite (string filename, string filepath)
-        {
-            if (filenames.Contains (filename))
-            {
-                Image<Rgba32> image = Image.Load<Rgba32> (filepath);
-                sprites[filename].Dispose ();
-                sprites[filename] = image;
-
-                Refresh ();
-            }
-        }
-
-        public void RemoveSprite (string filename)
-        {
-            if (filenames.Contains (filename))
-            {
-                filenames.Remove (filename);
-                sprites[filename].Dispose ();
-                sprites.Remove (filename);
-                positions.Remove (filename);
-
-                Refresh ();
-            }
-        }
-
-        public void Clear ()
-        {
-            filenames.Clear ();
-            foreach (var sprite in sprites)
-                sprite.Value.Dispose ();
-            sprites.Clear ();
-            positions.Clear ();
-        }
-
-        private void Refresh ()
-        {
-            Refresh (128);
-        }
-
-        private void Refresh (int targetSize)
-        {
-            int currentHorizontal = 0, currentVertical = 0;
-            int currentMaximumHeight = 0;
-
-            foreach (var sprite in sprites)
-            {
-                int nextHorizontal = currentHorizontal + sprite.Value.Width;
-
-                if (nextHorizontal > targetSize)
-                {
-                    currentHorizontal = 0;
-                    int nextVertical = currentVertical + currentMaximumHeight;
-                    if (nextVertical > targetSize)
-                    {
-                        if (targetSize != MaximumSize)
-                        {
-                            Refresh (targetSize * 2);
-                            return;
-                        }
-                        positions [sprite.Key] = new System.Drawing.Point (-1, -1);
-                        continue;
-                    }
-                    currentVertical = nextVertical;
-                    currentMaximumHeight = sprite.Value.Height;
-                }
-
-                positions [sprite.Key] = new System.Drawing.Point (currentHorizontal, currentVertical);
-                currentMaximumHeight = (int) Math.Max (currentMaximumHeight, sprite.Value.Height);
-
-                currentHorizontal = nextHorizontal;
-            }
-
-            CurrentSize = targetSize;
-        }
-
-		public Image GenerateSpriteSheet ()
+		public string AddSprite (string filepath)
 		{
-            Image<Rgba32> spriteSheet = new Image<Rgba32> (CurrentSize, CurrentSize);
-
-            foreach (var filename in filenames)
-            {
-                var sprite = sprites [filename];
-                var position = positions [filename];
-
-                for (int y = 0; y < sprite.Height; ++y)
-                {
-                    for (int x = 0; x < sprite.Width; ++x)
-                    {
-                        spriteSheet [x + position.X, y + position.Y] = sprite [x, y];
-                    }
-                }
-            }
-
-            return spriteSheet;
+			var item = new SheetItem (filepath);
+			items.Add (item);
+			Refresh ();
+			return item.Name;
 		}
-    }
+
+		public void ReplaceSprite (string filename, string filepath)
+		{
+			var item = items.Find (i => i.Name == filename);
+			if (item == null)
+				return;
+			item.Set (filepath);
+			Refresh ();
+		}
+
+		public void RemoveSprite (string filename)
+		{
+			var item = items.Find (i => i.Name == filename);
+			if (item == null)
+				return;
+			items.Remove (item);
+			Refresh ();
+		}
+
+		public void Clear ()
+		{
+			items.Clear ();
+			Refresh ();
+		}
+
+		private void Refresh ()
+		{
+			Refresh (128);
+		}
+
+		private void Refresh (int targetSize)
+		{
+			foreach (var item in items)
+				item.SheetArea.Location = new System.Drawing.Point (-1, -1);
+
+			foreach (var item in items)
+			{
+				bool isBatched = true;
+				bool isHorizontalCompare = true;
+
+				if ((from i in items where i.SheetArea.Location != new System.Drawing.Point (-1, -1) select i).Count () == 0)
+				{
+					item.SheetArea.Location = new System.Drawing.Point (0, 0);
+					continue;
+				}
+
+				for (int compare = 0; compare < 2; ++compare)
+				{
+					isBatched = true;
+
+					Rectangle current = new Rectangle (0, 0, item.Sprite.Width, item.Sprite.Height);
+					foreach (var batchedItem in from i in items where i.SheetArea.Location != new System.Drawing.Point (-1, -1) select i)
+					{
+						if (batchedItem.SheetArea.IntersectsWith (current))
+							isBatched = false;
+						else
+						{
+							if ((isHorizontalCompare && (current.X + current.Width > targetSize)) || (!isHorizontalCompare && (current.Y + current.Height > targetSize)))
+								isBatched = false;
+							else
+								isBatched = true;
+						}
+
+						if (!isBatched)
+						{
+							if (isHorizontalCompare)
+							{
+								current.X = batchedItem.SheetArea.X + batchedItem.SheetArea.Width;
+								current.Y = batchedItem.SheetArea.Y;
+							}
+							else
+							{
+								current.X = batchedItem.SheetArea.X;
+								current.Y = batchedItem.SheetArea.Y + batchedItem.SheetArea.Height;
+							}
+
+							if ((isHorizontalCompare && (current.X + current.Width > targetSize)) || (!isHorizontalCompare && (current.Y + current.Height > targetSize)))
+								isBatched = false;
+							else
+								isBatched = true;
+						}
+					}
+
+					if (isBatched)
+					{
+						item.SheetArea = current;
+						break;
+					}
+					if (isHorizontalCompare)
+						isHorizontalCompare = false;
+				}
+			}
+
+			if ((from i in items where i.SheetArea.Location == new System.Drawing.Point (-1, -1) select i).Count () != 0)
+			{
+				if (targetSize < maximumSize)
+				{
+					Refresh (targetSize * 2);
+					return;
+				}
+			}
+
+			CurrentSize = targetSize;
+		}
+
+		public Image<Rgba32> GenerateSpriteSheet ()
+		{
+			Image<Rgba32> spriteSheet = new Image<Rgba32> (CurrentSize, CurrentSize);
+
+			foreach (var item in items)
+			{
+				if (item.SheetArea.Location == new System.Drawing.Point (-1, -1))
+					continue;
+				for (int y = 0; y < item.SheetArea.Height; ++y)
+				{
+					for (int x = 0; x < item.SheetArea.Width; ++x)
+					{
+						spriteSheet [x + item.SheetArea.X, y + item.SheetArea.Y] = item.Sprite [x, y];
+					}
+				}
+			}
+
+			return spriteSheet;
+		}
+	}
 }

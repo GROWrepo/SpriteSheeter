@@ -2,7 +2,7 @@
   "profiles": {
     "SpriteSheeter.Console": {
       "commandName": "Project",
-      "commandLineArgs": "C:\\Projects\\GitHub\\Colors\\Assets\\Resources\\Stage\\Obstacle\\object_big1.png C:\\Projects\\GitHub\\Colors\\Assets\\Resources\\Stage\\Obstacle\\object_big2.png C:\\Projects\\GitHub\\Colors\\Assets\\Resources\\Stage\\Obstacle\\object_small1.png C:\\Projects\\GitHub\\Colors\\Assets\\Resources\\Stage\\Obstacle\\object_small2.png C:\\Projects\\GitHub\\Colors\\Assets\\Resources\\Stage\\Obstacle\\object_small3.png"
+      "commandLineArgs": "..\\..\\..\\..\\Samples\\object_big1.png ..\\..\\..\\..\\Samples\\object_big2.png ..\\..\\..\\..\\Samples\\object_small1.png ..\\..\\..\\..\\Samples\\object_small2.png ..\\..\\..\\..\\Samples\\object_small3.png ..\\..\\..\\..\\Samples\\pause.png ..\\..\\..\\..\\Samples\\floor.png ..\\..\\..\\..\\Samples\\cyan.png ..\\..\\..\\..\\Samples\\magenta.png ..\\..\\..\\..\\Samples\\yellow.png ..\\..\\..\\..\\Samples\\gray.png ..\\..\\..\\..\\Samples\\jump1.png ..\\..\\..\\..\\Samples\\jump2.png ..\\..\\..\\..\\Samples\\jump3.png ..\\..\\..\\..\\Samples\\jump4.png"
     }
   }
 }

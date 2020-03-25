@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
 using System.Text;
 using SixLabors.ImageSharp;
@@ -76,13 +77,13 @@ namespace SpriteSheeter
 				using (StreamWriter writer = new StreamWriter (outputStream, Encoding.UTF8))
 				{
 					writer.WriteLine ("{");
-					foreach (var filename in spriteSheet.Filenames)
+					foreach (var item in spriteSheet.Items)
 					{
-						var position = spriteSheet.Positions[filename];
-						var sprite = spriteSheet.Sprites[filename];
-						var size = new System.Drawing.Size (sprite.Width, sprite.Height);
-						Console.WriteLine ($"INFO: {filename}: {new System.Drawing.Rectangle (position, size)}");
-						writer.WriteLine ($"\t\"{filename}\" : \"{position.X},{position.Y},{size.Width},{size.Height}\"{((filename != spriteSheet.Filenames[spriteSheet.Filenames.Count - 1]) ? "," : "")}");
+						var area = item.SheetArea;
+						var message = $"INFO: {item.Name}: {area}";
+						Console.WriteLine (message);
+						Debug.WriteLine (message);
+						writer.WriteLine ($"\t\"{item.Name}\" : \"{area.X},{area.Y},{area.Width},{area.Height}\"{((item.Name != spriteSheet.Items[spriteSheet.Items.Count - 1].Name) ? "," : "")}");
 					}
 
 					writer.WriteLine ("}");
