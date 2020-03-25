@@ -71,7 +71,8 @@ namespace SpriteSheeter
 
 		private void MenuItemSpriteAdd_Click (object sender, EventArgs e)
 		{
-			if(OpenFileDialogSprite.ShowDialog () == DialogResult.Cancel)
+			OpenFileDialogSprite.Multiselect = true;
+			if(OpenFileDialogSprite.ShowDialog (this) == DialogResult.Cancel)
 				return;
 
 			foreach (var filename in OpenFileDialogSprite.FileNames)
@@ -80,6 +81,47 @@ namespace SpriteSheeter
 			spriteSheet.Refresh ();
 			var spriteSheetImage = spriteSheet.GenerateSpriteSheet ();
 			PictureBoxPreview.Image = ImageHelper.Convert (spriteSheetImage);
+		}
+
+		private void MenuItemSpriteRemove_Click (object sender, EventArgs e)
+		{
+			List<SheetItem> selectedItems = new List<SheetItem> ();
+			List<ListViewItem> selectedListViewItems = new List<ListViewItem> ();
+			foreach (int index in ListViewSprites.SelectedIndices)
+			{
+				selectedItems.Add (spriteSheet.Items [index]);
+				selectedListViewItems.Add (ListViewSprites.Items [index]);
+			}
+
+			foreach (var item in selectedListViewItems)
+				ListViewSprites.Items.Remove (item);
+			foreach (var item in selectedItems)
+				spriteSheet.RemoveSprite (item.Name);
+
+			spriteSheet.Refresh ();
+			var spriteSheetImage = spriteSheet.GenerateSpriteSheet ();
+			PictureBoxPreview.Image = ImageHelper.Convert (spriteSheetImage);
+		}
+
+		private void MenuItemSpriteReplace_Click (object sender, EventArgs e)
+		{
+			if (ListViewSprites.SelectedIndices.Count == 0)
+				return;
+
+			OpenFileDialogSprite.Multiselect = true;
+			if (OpenFileDialogSprite.ShowDialog (this) == DialogResult.Cancel)
+				return;
+
+			spriteSheet.Items [ListViewSprites.SelectedIndices [0]].Set (OpenFileDialogSprite.FileName, false);
+
+			spriteSheet.Refresh ();
+			var spriteSheetImage = spriteSheet.GenerateSpriteSheet ();
+			PictureBoxPreview.Image = ImageHelper.Convert (spriteSheetImage);
+		}
+
+		private void ListViewSprites_DoubleClick (object sender, EventArgs e)
+		{
+			MenuItemSpriteReplace_Click (sender, e);
 		}
 
 		private void ComboBoxMaximumSize_SelectedIndexChanged (object sender, EventArgs e)
@@ -131,6 +173,8 @@ namespace SpriteSheeter
 			ToolTipSelectedDetails.Hide (PictureBoxPreview);
 			foreach (int index in ListViewSprites.SelectedIndices)
 			{
+				if (spriteSheet.Items.Count <= index)
+					continue;
 				var area = spriteSheet.Items [index].SheetArea;
 				if (area.Location == SpriteSheet.NOT_BATCHED)
 					continue;

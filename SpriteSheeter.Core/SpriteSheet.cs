@@ -24,9 +24,10 @@ namespace SpriteSheeter
 			Set (path);
 		}
 
-		public void Set (string path)
+		public void Set (string path, bool rename = true)
 		{
-			Name = System.IO.Path.GetFileName (path);
+			if (rename)
+				Name = System.IO.Path.GetFileName (path);
 			Sprite = SixLabors.ImageSharp.Image.Load<Rgba32> (path);
 			ResetArea ();
 		}

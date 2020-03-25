@@ -96,6 +96,9 @@
     <Content Include="Resources\disk.png" />
     <Content Include="Resources\folder.png" />
     <Content Include="Resources\page.png" />
+    <None Include="Resources\picture_edit.png" />
+    <None Include="Resources\picture_delete.png" />
+    <None Include="Resources\picture_add.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
