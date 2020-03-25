@@ -119,8 +119,7 @@ namespace SpriteSheeter
 			Refresh (128);
 		}
 
-
-		private static readonly System.Drawing.Point NOT_BATCHED = new System.Drawing.Point(-1, -1);
+		public static readonly System.Drawing.Point NOT_BATCHED = new System.Drawing.Point(-1, -1);
 		private IEnumerable<SheetItem> GetBatchedItems () =>
 			from item in items where item.SheetArea.Location != NOT_BATCHED select item;
 		private IEnumerable<SheetItem> GetNotBatchedItems () =>
@@ -169,8 +168,17 @@ namespace SpriteSheeter
 						isBatched = false;
 					}
 
-					if (!isBatched)
+					if (isBatched)
+						break;
+				}
+
+				if (!isBatched)
+				{
+					foreach (var batched in GetBatchedItems ())
 					{
+						if (item == batched)
+							continue;
+
 						isBatched = true;
 						item.SheetArea.Location = new System.Drawing.Point (batched.SheetArea.X, batched.SheetArea.Y + batched.SheetArea.Height);
 						if ((item.SheetArea.X + item.SheetArea.Width) <= targetSize
@@ -193,10 +201,10 @@ namespace SpriteSheeter
 							item.SheetArea.Location = NOT_BATCHED;
 							isBatched = false;
 						}
-					}
 
-					if (isBatched)
-						break;
+						if (isBatched)
+							break;
+					}
 				}
 
 				if (!isBatched)
