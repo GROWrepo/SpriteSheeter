@@ -91,6 +91,9 @@
     <PackageReference Include="SixLabors.ImageSharp">
       <Version>1.0.0-beta0007</Version>
     </PackageReference>
+    <PackageReference Include="System.Text.Json">
+      <Version>4.7.1</Version>
+    </PackageReference>
   </ItemGroup>
   <ItemGroup>
     <Content Include="Resources\disk.png" />

@@ -3,8 +3,11 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -19,6 +22,114 @@ namespace SpriteSheeter
 		static readonly Brush TransparentGrayBrush = new SolidBrush (Color.LightGray);
 
 		SpriteSheet spriteSheet;
+		bool isDirty;
+		string savepath;
+
+		public bool IsSaved
+		{
+			get
+			{
+				if (isDirty)
+				{
+					switch (MessageBox.Show ("저장하시겠습니까?", "스프라이트 시터", MessageBoxButtons.YesNoCancel))
+					{
+						case DialogResult.Yes: return Save ();
+						case DialogResult.No: return true;
+						case DialogResult.Cancel: return false;
+					}
+				}
+				return true;
+			}
+		}
+
+		public class FileItem
+		{
+			[JsonPropertyName ("name")]
+			public string Name { get; set; }
+			[JsonPropertyName ("image")]
+			public string ImageBase64 { get; set; }
+		}
+
+		public void Open ()
+		{
+			if (OpenFileDialogSpriteSheet.ShowDialog (this) == DialogResult.Cancel)
+				return;
+
+			spriteSheet.Clear ();
+			ListViewSprites.Items.Clear ();
+
+			string input = File.ReadAllText (OpenFileDialogSpriteSheet.FileName);
+			List<FileItem> fileItems = JsonSerializer.Deserialize<List<FileItem>> (input);
+			foreach (var fileItem in fileItems)
+			{
+				SheetItem item = new SheetItem ();
+				item.Name = fileItem.Name;
+				byte [] imageData = Convert.FromBase64String (fileItem.ImageBase64);
+				using (MemoryStream stream = new MemoryStream (imageData))
+				{
+					stream.Position = 0;
+					item.Sprite = SixLabors.ImageSharp.Image.Load<SixLabors.ImageSharp.PixelFormats.Rgba32> (stream);
+				}
+				item.ResetArea ();
+
+				string name = spriteSheet.AddSprite (item);
+				var listViewItem = ListViewSprites.Items.Add (name);
+				ListViewSprites.SmallImageList.Images.Add (name, ImageHelper.Convert (spriteSheet [name].Sprite));
+				listViewItem.ImageKey = name;
+			}
+
+			isDirty = false;
+			savepath = OpenFileDialogSpriteSheet.FileName;
+
+			spriteSheet.Refresh ();
+			var spriteSheetImage = spriteSheet.GenerateSpriteSheet ();
+			PictureBoxPreview.Image = ImageHelper.Convert (spriteSheetImage);
+		}
+
+		public bool Save (bool force = false)
+		{
+			if (isDirty || force)
+			{
+				if (string.IsNullOrEmpty (savepath) || force)
+				{
+					if (SaveFileDialogSpriteSheet.ShowDialog (this) == DialogResult.Cancel)
+						return false;
+					savepath = SaveFileDialogSpriteSheet.FileName;
+				}
+
+				List<FileItem> fileItems = new List<FileItem> ();
+				foreach (var item in spriteSheet.Items)
+				{
+					MemoryStream imageData = new MemoryStream ();
+					item.Sprite.Save (imageData, new SixLabors.ImageSharp.Formats.Png.PngEncoder ()
+					{
+						BitDepth = SixLabors.ImageSharp.Formats.Png.PngBitDepth.Bit8,
+						ColorType = SixLabors.ImageSharp.Formats.Png.PngColorType.RgbWithAlpha,
+						FilterMethod = SixLabors.ImageSharp.Formats.Png.PngFilterMethod.Adaptive,
+						InterlaceMethod = SixLabors.ImageSharp.Formats.Png.PngInterlaceMode.None,
+					});
+
+					var fileItem = new FileItem ();
+					fileItem.Name = item.Name;
+					fileItem.ImageBase64 = Convert.ToBase64String (imageData.ToArray ());
+
+					fileItems.Add (fileItem);
+				}
+
+				string output = JsonSerializer.Serialize (fileItems);
+				using (Stream fileStream = new FileStream (savepath, FileMode.Create, FileAccess.Write))
+				{
+					using (TextWriter writer = new StreamWriter (fileStream))
+					{
+						writer.Write (output);
+						writer.Flush ();
+					}
+				}
+
+				isDirty = false;
+			}
+			return true;
+		}
 
 		public MainWindow ()
 		{
@@ -26,6 +137,7 @@ namespace SpriteSheeter
 
 			spriteSheet = new SpriteSheet ();
 			spriteSheet.IsDelayedRefresh = true;
+			isDirty = false;
 
 			ComboBoxMaximumSize.Text = spriteSheet.MaximumSize.ToString ();
 			ListViewSprites.SmallImageList = new ImageList ();
@@ -37,26 +149,40 @@ namespace SpriteSheeter
 			var item = ListViewSprites.Items.Add (name);
 			ListViewSprites.SmallImageList.Images.Add (name, ImageHelper.Convert (spriteSheet [name].Sprite));
 			item.ImageKey = name;
+			isDirty = true;
 		}
 
 		private void MenuItemNewSpriteSheet_Click (object sender, EventArgs e)
 		{
+			if (!IsSaved)
+				return;
 
+			spriteSheet.Clear ();
+			ListViewSprites.Items.Clear ();
+
+			isDirty = false;
+			savepath = null;
+
+			spriteSheet.Refresh ();
+			var spriteSheetImage = spriteSheet.GenerateSpriteSheet ();
+			PictureBoxPreview.Image = ImageHelper.Convert (spriteSheetImage);
 		}
 
 		private void MenuItemOpen_Click (object sender, EventArgs e)
 		{
-
+			if (!IsSaved)
+				return;
+			Open ();
 		}
 
 		private void MenuItemSave_Click (object sender, EventArgs e)
 		{
-
+			Save ();
 		}
 
 		private void MenuItemSaveAs_Click (object sender, EventArgs e)
 		{
-
+			Save (true);
 		}
 
 		private void MenuItemExport_Click (object sender, EventArgs e)
@@ -98,6 +224,8 @@ namespace SpriteSheeter
 			foreach (var item in selectedItems)
 				spriteSheet.RemoveSprite (item.Name);
 
+			isDirty = true;
+
 			spriteSheet.Refresh ();
 			var spriteSheetImage = spriteSheet.GenerateSpriteSheet ();
 			PictureBoxPreview.Image = ImageHelper.Convert (spriteSheetImage);
@@ -113,6 +241,8 @@ namespace SpriteSheeter
 				return;
 
 			spriteSheet.Items [ListViewSprites.SelectedIndices [0]].Set (OpenFileDialogSprite.FileName, false);
+
+			isDirty = true;
 
 			spriteSheet.Refresh ();
 			var spriteSheetImage = spriteSheet.GenerateSpriteSheet ();

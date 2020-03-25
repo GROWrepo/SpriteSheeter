@@ -61,6 +61,8 @@
 			this.ToolStripButtonAddSprite = new System.Windows.Forms.ToolStripButton();
 			this.ToolStripButtonRemoveSprite = new System.Windows.Forms.ToolStripButton();
 			this.MenuItemSpriteReplace = new System.Windows.Forms.ToolStripMenuItem();
+			this.SaveFileDialogSpriteSheet = new System.Windows.Forms.SaveFileDialog();
+			this.OpenFileDialogSpriteSheet = new System.Windows.Forms.OpenFileDialog();
 			this.MenuStripMainMenu.SuspendLayout();
 			this.ToolStripMainToolBar.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.SplitContainerEditor)).BeginInit();
@@ -380,6 +382,14 @@
 			this.MenuItemSpriteReplace.Text = "교체(P)";
 			this.MenuItemSpriteReplace.Click += new System.EventHandler(this.MenuItemSpriteReplace_Click);
 			// 
+			// SaveFileDialogSpriteSheet
+			// 
+			this.SaveFileDialogSpriteSheet.Filter = "스프라이트시트 파일(*.spsh)|*.spsh";
+			// 
+			// OpenFileDialogSpriteSheet
+			// 
+			this.OpenFileDialogSpriteSheet.Filter = "스프라이트시트 파일(*.spsh)|*.spsh";
+			// 
 			// MainWindow
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 12F);
@@ -442,6 +452,8 @@
 		private System.Windows.Forms.ToolStripButton ToolStripButtonRemoveSprite;
 		private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
 		private System.Windows.Forms.ToolStripMenuItem MenuItemSpriteReplace;
+		private System.Windows.Forms.SaveFileDialog SaveFileDialogSpriteSheet;
+		private System.Windows.Forms.OpenFileDialog OpenFileDialogSpriteSheet;
 	}
 }
 

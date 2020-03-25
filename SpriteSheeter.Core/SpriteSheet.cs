@@ -19,6 +19,8 @@ namespace SpriteSheeter
 		public Image<Rgba32> Sprite;
 		public Rectangle SheetArea;
 
+		public SheetItem () { }
+
 		public SheetItem (string path)
 		{
 			Set (path);
@@ -69,6 +71,14 @@ namespace SpriteSheeter
 		public string AddSprite (string filepath)
 		{
 			var item = new SheetItem (filepath);
+			items.Add (item);
+			if (!IsDelayedRefresh)
+				Refresh ();
+			return item.Name;
+		}
+
+		public string AddSprite (SheetItem item)
+		{
 			items.Add (item);
 			if (!IsDelayedRefresh)
 				Refresh ();
