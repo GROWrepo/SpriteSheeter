@@ -28,6 +28,7 @@
 		/// </summary>
 		private void InitializeComponent ()
 		{
+			this.components = new System.ComponentModel.Container();
 			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainWindow));
 			this.MenuStripMainMenu = new System.Windows.Forms.MenuStrip();
 			this.MenuItemFile = new System.Windows.Forms.ToolStripMenuItem();
@@ -55,6 +56,8 @@
 			this.PanelPreview = new System.Windows.Forms.Panel();
 			this.PictureBoxPreview = new System.Windows.Forms.PictureBox();
 			this.OpenFileDialogSprite = new System.Windows.Forms.OpenFileDialog();
+			this.columnHeader1 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+			this.ToolTipSelectedDetails = new System.Windows.Forms.ToolTip(this.components);
 			this.MenuStripMainMenu.SuspendLayout();
 			this.ToolStripMainToolBar.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.SplitContainerEditor)).BeginInit();
@@ -274,17 +277,22 @@
 			// 
 			// ListViewSprites
 			// 
+			this.ListViewSprites.AllowDrop = true;
 			this.ListViewSprites.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+			this.ListViewSprites.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.columnHeader1});
 			this.ListViewSprites.HideSelection = false;
 			this.ListViewSprites.Location = new System.Drawing.Point(0, 26);
 			this.ListViewSprites.Name = "ListViewSprites";
 			this.ListViewSprites.Size = new System.Drawing.Size(419, 606);
 			this.ListViewSprites.TabIndex = 2;
 			this.ListViewSprites.UseCompatibleStateImageBehavior = false;
-			this.ListViewSprites.View = System.Windows.Forms.View.List;
+			this.ListViewSprites.View = System.Windows.Forms.View.Details;
 			this.ListViewSprites.SelectedIndexChanged += new System.EventHandler(this.ListViewSprites_SelectedIndexChanged);
+			this.ListViewSprites.DragDrop += new System.Windows.Forms.DragEventHandler(this.ListViewSprites_DragDrop);
+			this.ListViewSprites.DragEnter += new System.Windows.Forms.DragEventHandler(this.ListViewSprites_DragEnter);
 			// 
 			// label1
 			// 
@@ -316,11 +324,17 @@
 			this.PictureBoxPreview.TabIndex = 0;
 			this.PictureBoxPreview.TabStop = false;
 			this.PictureBoxPreview.Paint += new System.Windows.Forms.PaintEventHandler(this.PictureBoxPreview_Paint);
+			this.PictureBoxPreview.MouseUp += new System.Windows.Forms.MouseEventHandler(this.PictureBoxPreview_MouseUp);
 			// 
 			// OpenFileDialogSprite
 			// 
 			this.OpenFileDialogSprite.Filter = "지원하는 모든 이미지 파일(*.png;*.bmp;*.jpg)|*.png;*.bmp;*.jpg";
 			this.OpenFileDialogSprite.Multiselect = true;
+			// 
+			// columnHeader1
+			// 
+			this.columnHeader1.Text = "파일";
+			this.columnHeader1.Width = 256;
 			// 
 			// MainWindow
 			// 
@@ -378,6 +392,8 @@
 		private System.Windows.Forms.ToolStripButton toolStripButton4;
 		private System.Windows.Forms.ComboBox ComboBoxMaximumSize;
 		private System.Windows.Forms.OpenFileDialog OpenFileDialogSprite;
+		private System.Windows.Forms.ColumnHeader columnHeader1;
+		private System.Windows.Forms.ToolTip ToolTipSelectedDetails;
 	}
 }
 

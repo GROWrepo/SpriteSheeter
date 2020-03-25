@@ -31,6 +31,14 @@ namespace SpriteSheeter
 			ListViewSprites.SmallImageList = new ImageList ();
 		}
 
+		private void AddSprite (string filename)
+		{
+			string name = spriteSheet.AddSprite (filename);
+			var item = ListViewSprites.Items.Add (name);
+			ListViewSprites.SmallImageList.Images.Add (name, ImageHelper.Convert (spriteSheet [name].Sprite));
+			item.ImageKey = name;
+		}
+
 		private void MenuItemNewSpriteSheet_Click (object sender, EventArgs e)
 		{
 
@@ -67,12 +75,7 @@ namespace SpriteSheeter
 				return;
 
 			foreach (var filename in OpenFileDialogSprite.FileNames)
-			{
-				string name = spriteSheet.AddSprite (filename);
-				var item = ListViewSprites.Items.Add (name);
-				ListViewSprites.SmallImageList.Images.Add (name, ImageHelper.Convert (spriteSheet [name].Sprite));
-				item.ImageKey = name;
-			}
+				AddSprite (filename);
 
 			spriteSheet.Refresh ();
 			var spriteSheetImage = spriteSheet.GenerateSpriteSheet ();
@@ -92,6 +95,24 @@ namespace SpriteSheeter
 			PictureBoxPreview.Refresh ();
 		}
 
+		private void ListViewSprites_DragEnter (object sender, DragEventArgs e)
+		{
+			if (e.Data.GetDataPresent (DataFormats.FileDrop))
+				e.Effect = DragDropEffects.Link;
+			else
+				e.Effect = DragDropEffects.None;
+		}
+
+		private void ListViewSprites_DragDrop (object sender, DragEventArgs e)
+		{
+			foreach (string filename in e.Data.GetData (DataFormats.FileDrop) as string [])
+				AddSprite (filename);
+
+			spriteSheet.Refresh ();
+			var spriteSheetImage = spriteSheet.GenerateSpriteSheet ();
+			PictureBoxPreview.Image = ImageHelper.Convert (spriteSheetImage);
+		}
+
 		private void PictureBoxPreview_Paint (object sender, PaintEventArgs e)
 		{
 			for (int y = 0; y < PictureBoxPreview.Height; y += 8)
@@ -107,11 +128,30 @@ namespace SpriteSheeter
 				}
 			}
 			e.Graphics.DrawImage (PictureBoxPreview.Image, new Point ());
+			ToolTipSelectedDetails.Hide (PictureBoxPreview);
 			foreach (int index in ListViewSprites.SelectedIndices)
 			{
 				var area = spriteSheet.Items [index].SheetArea;
+				if (area.Location == SpriteSheet.NOT_BATCHED)
+					continue;
 				e.Graphics.DrawRectangle (SelectedItemBlackPen, area);
-				e.Graphics.DrawString (area.ToString (), TextFont, TextBrush, new Point (area.X, area.Y + area.Height));
+				if (ListViewSprites.SelectedIndices.Count == 1)
+					ToolTipSelectedDetails.Show ($"{area.X}, {area.Y}, {area.Width}, {area.Height}", PictureBoxPreview,
+						new Point (area.X, area.Y + area.Height), 3000);
+			}
+		}
+
+		private void PictureBoxPreview_MouseUp (object sender, MouseEventArgs e)
+		{
+			var mousePosition = new Rectangle (e.X, e.Y, 1, 1);
+			for (int i = 0; i < spriteSheet.Items.Count; ++i)
+			{
+				if (spriteSheet.Items [i].SheetArea.IntersectsWith (mousePosition))
+				{
+					ListViewSprites.SelectedIndices.Clear ();
+					ListViewSprites.SelectedIndices.Add (i);
+					break;
+				}
 			}
 		}
 	}
