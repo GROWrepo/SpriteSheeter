@@ -10,6 +10,9 @@ using SixLabors.ImageSharp.Memory;
 using SixLabors.ImageSharp.Metadata;
 using SixLabors.ImageSharp.Formats;
 using SixLabors.ImageSharp.ColorSpaces;
+using System.IO;
+using System.Text;
+using System.Diagnostics;
 
 namespace SpriteSheeter
 {
@@ -19,14 +22,17 @@ namespace SpriteSheeter
 		public Image<Rgba32> Sprite;
 		public Rectangle SheetArea;
 
+		public SheetItem () { }
+
 		public SheetItem (string path)
 		{
 			Set (path);
 		}
 
-		public void Set (string path)
+		public void Set (string path, bool rename = true)
 		{
-			Name = System.IO.Path.GetFileName (path);
+			if (rename)
+				Name = System.IO.Path.GetFileName (path);
 			Sprite = SixLabors.ImageSharp.Image.Load<Rgba32> (path);
 			ResetArea ();
 		}
@@ -35,6 +41,8 @@ namespace SpriteSheeter
 		{
 			SheetArea = new Rectangle (-1, -1, Sprite.Width, Sprite.Height);
 		}
+
+		public override string ToString () => $"{{Name: {Name}, Area: {SheetArea}}}";
 	}
 
 	public class SpriteSheet
@@ -56,6 +64,8 @@ namespace SpriteSheeter
 
 		public int CurrentSize { get; private set; } = 128;
 
+		public bool IsDelayedRefresh { get; set; } = false;
+
 		public SpriteSheet ()
 		{
 
@@ -65,7 +75,16 @@ namespace SpriteSheeter
 		{
 			var item = new SheetItem (filepath);
 			items.Add (item);
-			Refresh ();
+			if (!IsDelayedRefresh)
+				Refresh ();
+			return item.Name;
+		}
+
+		public string AddSprite (SheetItem item)
+		{
+			items.Add (item);
+			if (!IsDelayedRefresh)
+				Refresh ();
 			return item.Name;
 		}
 
@@ -75,7 +94,8 @@ namespace SpriteSheeter
 			if (item == null)
 				return;
 			item.Set (filepath);
-			Refresh ();
+			if (!IsDelayedRefresh)
+				Refresh ();
 		}
 
 		public void RemoveSprite (string filename)
@@ -84,84 +104,130 @@ namespace SpriteSheeter
 			if (item == null)
 				return;
 			items.Remove (item);
-			Refresh ();
+			if (!IsDelayedRefresh)
+				Refresh ();
 		}
 
 		public void Clear ()
 		{
 			items.Clear ();
-			Refresh ();
+			if (!IsDelayedRefresh)
+				Refresh ();
 		}
 
-		private void Refresh ()
+		public SheetItem FindItem (string name)
+		{
+			foreach (var item in items)
+				if (item.Name == name)
+					return item;
+			return null;
+		}
+
+		public SheetItem this[string name]
+		{
+			get => FindItem (name);
+		}
+
+		public void Refresh ()
 		{
 			Refresh (128);
 		}
 
+		public static readonly System.Drawing.Point NOT_BATCHED = new System.Drawing.Point(-1, -1);
+		private IEnumerable<SheetItem> GetBatchedItems () =>
+			from item in items where item.SheetArea.Location != NOT_BATCHED select item;
+		private IEnumerable<SheetItem> GetNotBatchedItems () =>
+			from item in items where item.SheetArea.Location == NOT_BATCHED select item;
+
 		private void Refresh (int targetSize)
 		{
 			foreach (var item in items)
-				item.SheetArea.Location = new System.Drawing.Point (-1, -1);
+				item.SheetArea.Location = NOT_BATCHED;
 
 			foreach (var item in items)
 			{
 				bool isBatched = true;
-				bool isHorizontalCompare = true;
 
-				if ((from i in items where i.SheetArea.Location != new System.Drawing.Point (-1, -1) select i).Count () == 0)
+				if (GetBatchedItems ().Count () == 0)
 				{
 					item.SheetArea.Location = new System.Drawing.Point (0, 0);
 					continue;
 				}
 
-				for (int compare = 0; compare < 2; ++compare)
+				foreach (var batched in GetBatchedItems ())
 				{
+					if (item == batched)
+						continue;
+
 					isBatched = true;
-
-					Rectangle current = new Rectangle (0, 0, item.Sprite.Width, item.Sprite.Height);
-					foreach (var batchedItem in from i in items where i.SheetArea.Location != new System.Drawing.Point (-1, -1) select i)
+					item.SheetArea.Location = new System.Drawing.Point (batched.SheetArea.X + batched.SheetArea.Width, batched.SheetArea.Y);
+					if ((item.SheetArea.X + item.SheetArea.Width) <= targetSize
+						&& (item.SheetArea.Y + item.SheetArea.Height) <= targetSize)
 					{
-						if (batchedItem.SheetArea.IntersectsWith (current))
-							isBatched = false;
-						else
+						foreach (var batchedCompare in GetBatchedItems ())
 						{
-							if ((isHorizontalCompare && (current.X + current.Width > targetSize)) || (!isHorizontalCompare && (current.Y + current.Height > targetSize)))
-								isBatched = false;
-							else
-								isBatched = true;
-						}
-
-						if (!isBatched)
-						{
-							if (isHorizontalCompare)
+							if (batched == batchedCompare || item == batchedCompare)
+								continue;
+							if (item.SheetArea.IntersectsWith (batchedCompare.SheetArea))
 							{
-								current.X = batchedItem.SheetArea.X + batchedItem.SheetArea.Width;
-								current.Y = batchedItem.SheetArea.Y;
-							}
-							else
-							{
-								current.X = batchedItem.SheetArea.X;
-								current.Y = batchedItem.SheetArea.Y + batchedItem.SheetArea.Height;
-							}
-
-							if ((isHorizontalCompare && (current.X + current.Width > targetSize)) || (!isHorizontalCompare && (current.Y + current.Height > targetSize)))
+								item.SheetArea.Location = NOT_BATCHED;
 								isBatched = false;
-							else
-								isBatched = true;
+								break;
+							}
 						}
+					}
+					else
+					{
+						item.SheetArea.Location = NOT_BATCHED;
+						isBatched = false;
 					}
 
 					if (isBatched)
-					{
-						item.SheetArea = current;
 						break;
+				}
+
+				if (!isBatched)
+				{
+					foreach (var batched in GetBatchedItems ())
+					{
+						if (item == batched)
+							continue;
+
+						isBatched = true;
+						item.SheetArea.Location = new System.Drawing.Point (batched.SheetArea.X, batched.SheetArea.Y + batched.SheetArea.Height);
+						if ((item.SheetArea.X + item.SheetArea.Width) <= targetSize
+							&& (item.SheetArea.Y + item.SheetArea.Height) <= targetSize)
+						{
+							foreach (var batchedCompare in GetBatchedItems ())
+							{
+								if (batched == batchedCompare || item == batchedCompare)
+									continue;
+								if (item.SheetArea.IntersectsWith (batchedCompare.SheetArea))
+								{
+									item.SheetArea.Location = NOT_BATCHED;
+									isBatched = false;
+									break;
+								}
+							}
+						}
+						else
+						{
+							item.SheetArea.Location = NOT_BATCHED;
+							isBatched = false;
+						}
+
+						if (isBatched)
+							break;
 					}
-					if (isHorizontalCompare)
-						isHorizontalCompare = false;
+				}
+
+				if (!isBatched)
+				{
+					item.SheetArea.Location = NOT_BATCHED;
 				}
 			}
 
-			if ((from i in items where i.SheetArea.Location == new System.Drawing.Point (-1, -1) select i).Count () != 0)
+			if (GetNotBatchedItems ().Count () != 0)
 			{
 				if (targetSize < maximumSize)
 				{
@@ -179,7 +245,7 @@ namespace SpriteSheeter
 
 			foreach (var item in items)
 			{
-				if (item.SheetArea.Location == new System.Drawing.Point (-1, -1))
+				if (item.SheetArea.Location == NOT_BATCHED)
 					continue;
 				for (int y = 0; y < item.SheetArea.Height; ++y)
 				{
@@ -191,6 +257,41 @@ namespace SpriteSheeter
 			}
 
 			return spriteSheet;
+		}
+
+		public bool Export (string targetPath, string name)
+		{
+			using (Image generated = GenerateSpriteSheet ())
+			{
+				generated.Save (Path.Combine (targetPath, $"{name}.png"), new SixLabors.ImageSharp.Formats.Png.PngEncoder ()
+				{
+					BitDepth = SixLabors.ImageSharp.Formats.Png.PngBitDepth.Bit8,
+					ColorType = SixLabors.ImageSharp.Formats.Png.PngColorType.RgbWithAlpha,
+					FilterMethod = SixLabors.ImageSharp.Formats.Png.PngFilterMethod.Adaptive,
+					InterlaceMethod = SixLabors.ImageSharp.Formats.Png.PngInterlaceMode.None,
+				});
+			}
+
+			using (Stream outputStream = new FileStream (Path.Combine (targetPath, $"{name}.json"), FileMode.Create))
+			{
+				using (StreamWriter writer = new StreamWriter (outputStream, Encoding.UTF8))
+				{
+					writer.WriteLine ("{");
+					foreach (var item in items)
+					{
+						var area = item.SheetArea;
+						var message = $"INFO: {item.Name}: {area}";
+						Console.WriteLine (message);
+						Debug.WriteLine (message);
+						writer.WriteLine ($"\t\"{item.Name}\" : \"{area.X},{area.Y},{area.Width},{area.Height}\"{((item.Name != items [items.Count - 1].Name) ? "," : "")}");
+					}
+
+					writer.WriteLine ("}");
+					writer.Flush ();
+				}
+			}
+
+			return true;
 		}
 	}
 }

@@ -1,9 +1,16 @@
 ﻿using System;
 using System.Diagnostics;
+<<<<<<< HEAD
 using System.IO;
 using System.Text;
 using SixLabors.ImageSharp;
 
+=======
+using System.IO;
+using System.Text;
+using SixLabors.ImageSharp;
+
+>>>>>>> 1-implement-basic-features
 namespace SpriteSheeter
 {
 	class Program
@@ -22,7 +29,10 @@ namespace SpriteSheeter
 				return;
 			}
 
-			SpriteSheet spriteSheet = new SpriteSheet ();
+			SpriteSheet spriteSheet = new SpriteSheet ()
+			{
+				IsDelayedRefresh = true
+			};
 			string outputDir = "";
 			string outputFilename = "output";
 
@@ -56,15 +66,7 @@ namespace SpriteSheeter
 				}
 				catch (Exception ex)
 				{
-					Console.WriteLine ($"ERROR: Cannot load Image: {file} because: {ex.Message}");
-					continue;
-				}
-			}
-
-			using (Image generated = spriteSheet.GenerateSpriteSheet ())
-			{
-				generated.Save (Path.Combine (outputDir, $"{outputFilename}.png"), new SixLabors.ImageSharp.Formats.Png.PngEncoder ()
-				{
+<<<<<<< HEAD
 					BitDepth = SixLabors.ImageSharp.Formats.Png.PngBitDepth.Bit8,
 					ColorType = SixLabors.ImageSharp.Formats.Png.PngColorType.RgbWithAlpha,
 					FilterMethod = SixLabors.ImageSharp.Formats.Png.PngFilterMethod.Adaptive,
@@ -91,5 +93,15 @@ namespace SpriteSheeter
 				}
 			}
 		}
+=======
+					Console.WriteLine ($"ERROR: Cannot load Image: {file} because: {ex.Message}");
+					continue;
+				}
+			}
+
+			spriteSheet.Refresh ();
+			spriteSheet.Export (outputDir, outputFilename);
+		}
+>>>>>>> 1-implement-basic-features
 	}
 }
