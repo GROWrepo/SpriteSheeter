@@ -5,19 +5,19 @@ using System.Runtime.InteropServices;
 // 어셈블리에 대한 일반 정보는 다음 특성 집합을 통해 
 // 제어됩니다. 어셈블리와 관련된 정보를 수정하려면
 // 이러한 특성 값을 변경하세요.
-[assembly: AssemblyTitle ("SpriteSheeter.Windows")]
-[assembly: AssemblyDescription ("")]
+[assembly: AssemblyTitle ("SpriteSheeter for Windows")]
+[assembly: AssemblyDescription ("SpriteSheet Generator for Windows")]
 [assembly: AssemblyConfiguration ("")]
-[assembly: AssemblyCompany ("")]
-[assembly: AssemblyProduct ("SpriteSheeter.Windows")]
-[assembly: AssemblyCopyright ("Copyright ©  2020")]
+[assembly: AssemblyCompany ("Team Hazelnut")]
+[assembly: AssemblyProduct ("SpriteSheeter for Windows")]
+[assembly: AssemblyCopyright ("Copyright © 2020 Jin Jae Yeon")]
 [assembly: AssemblyTrademark ("")]
 [assembly: AssemblyCulture ("")]
 
 // ComVisible을 false로 설정하면 이 어셈블리의 형식이 COM 구성 요소에 
 // 표시되지 않습니다. COM에서 이 어셈블리의 형식에 액세스하려면
 // 해당 형식에 대해 ComVisible 특성을 true로 설정하세요.
-[assembly: ComVisible (false)]
+[assembly: ComVisible (true)]
 
 // 이 프로젝트가 COM에 노출되는 경우 다음 GUID는 typelib의 ID를 나타냅니다.
 [assembly: Guid ("9223d7e1-21ed-4127-94cd-e3d163bfd750")]

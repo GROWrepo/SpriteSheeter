@@ -261,7 +261,7 @@ namespace SpriteSheeter
 
 		public bool Export (string targetPath, string name)
 		{
-			using (Image generated = GenerateSpriteSheet ())
+			using (SixLabors.ImageSharp.Image generated = GenerateSpriteSheet ())
 			{
 				generated.Save (Path.Combine (targetPath, $"{name}.png"), new SixLabors.ImageSharp.Formats.Png.PngEncoder ()
 				{

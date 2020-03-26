@@ -1,16 +1,9 @@
 ﻿using System;
 using System.Diagnostics;
-<<<<<<< HEAD
 using System.IO;
 using System.Text;
 using SixLabors.ImageSharp;
 
-=======
-using System.IO;
-using System.Text;
-using SixLabors.ImageSharp;
-
->>>>>>> 1-implement-basic-features
 namespace SpriteSheeter
 {
 	class Program
@@ -66,34 +59,6 @@ namespace SpriteSheeter
 				}
 				catch (Exception ex)
 				{
-<<<<<<< HEAD
-					BitDepth = SixLabors.ImageSharp.Formats.Png.PngBitDepth.Bit8,
-					ColorType = SixLabors.ImageSharp.Formats.Png.PngColorType.RgbWithAlpha,
-					FilterMethod = SixLabors.ImageSharp.Formats.Png.PngFilterMethod.Adaptive,
-					InterlaceMethod = SixLabors.ImageSharp.Formats.Png.PngInterlaceMode.None,
-				});
-			}
-
-			using (Stream outputStream = new FileStream (Path.Combine (outputDir, $"{outputFilename}.json"), FileMode.Create))
-			{
-				using (StreamWriter writer = new StreamWriter (outputStream, Encoding.UTF8))
-				{
-					writer.WriteLine ("{");
-					foreach (var item in spriteSheet.Items)
-					{
-						var area = item.SheetArea;
-						var message = $"INFO: {item.Name}: {area}";
-						Console.WriteLine (message);
-						Debug.WriteLine (message);
-						writer.WriteLine ($"\t\"{item.Name}\" : \"{area.X},{area.Y},{area.Width},{area.Height}\"{((item.Name != spriteSheet.Items[spriteSheet.Items.Count - 1].Name) ? "," : "")}");
-					}
-
-					writer.WriteLine ("}");
-					writer.Flush ();
-				}
-			}
-		}
-=======
 					Console.WriteLine ($"ERROR: Cannot load Image: {file} because: {ex.Message}");
 					continue;
 				}
@@ -102,6 +67,5 @@ namespace SpriteSheeter
 			spriteSheet.Refresh ();
 			spriteSheet.Export (outputDir, outputFilename);
 		}
->>>>>>> 1-implement-basic-features
 	}
 }

@@ -29,6 +29,7 @@
 		private void InitializeComponent ()
 		{
 			this.components = new System.ComponentModel.Container();
+			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainWindow));
 			this.MenuStripMainMenu = new System.Windows.Forms.MenuStrip();
 			this.MenuItemFile = new System.Windows.Forms.ToolStripMenuItem();
 			this.MenuItemNewSpriteSheet = new System.Windows.Forms.ToolStripMenuItem();
@@ -45,12 +46,7 @@
 			this.MenuItemSpriteRemove = new System.Windows.Forms.ToolStripMenuItem();
 			this.MenuItemSpriteReplace = new System.Windows.Forms.ToolStripMenuItem();
 			this.ToolStripMainToolBar = new System.Windows.Forms.ToolStrip();
-			this.ToolStripButtonNew = new System.Windows.Forms.ToolStripButton();
-			this.ToolStripButtonOpen = new System.Windows.Forms.ToolStripButton();
-			this.ToolStripButtonSave = new System.Windows.Forms.ToolStripButton();
 			this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
-			this.ToolStripButtonAddSprite = new System.Windows.Forms.ToolStripButton();
-			this.ToolStripButtonRemoveSprite = new System.Windows.Forms.ToolStripButton();
 			this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
 			this.SplitContainerEditor = new System.Windows.Forms.SplitContainer();
 			this.ComboBoxMaximumSize = new System.Windows.Forms.ComboBox();
@@ -58,12 +54,17 @@
 			this.columnHeader1 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
 			this.label1 = new System.Windows.Forms.Label();
 			this.PanelPreview = new System.Windows.Forms.Panel();
-			this.PictureBoxPreview = new System.Windows.Forms.PictureBox();
 			this.OpenFileDialogSprite = new System.Windows.Forms.OpenFileDialog();
 			this.ToolTipSelectedDetails = new System.Windows.Forms.ToolTip(this.components);
 			this.SaveFileDialogSpriteSheet = new System.Windows.Forms.SaveFileDialog();
 			this.OpenFileDialogSpriteSheet = new System.Windows.Forms.OpenFileDialog();
 			this.FolderBrowserDialogExport = new System.Windows.Forms.FolderBrowserDialog();
+			this.PictureBoxPreview = new System.Windows.Forms.PictureBox();
+			this.ToolStripButtonNew = new System.Windows.Forms.ToolStripButton();
+			this.ToolStripButtonOpen = new System.Windows.Forms.ToolStripButton();
+			this.ToolStripButtonSave = new System.Windows.Forms.ToolStripButton();
+			this.ToolStripButtonAddSprite = new System.Windows.Forms.ToolStripButton();
+			this.ToolStripButtonRemoveSprite = new System.Windows.Forms.ToolStripButton();
 			this.MenuStripMainMenu.SuspendLayout();
 			this.ToolStripMainToolBar.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.SplitContainerEditor)).BeginInit();
@@ -218,60 +219,10 @@
 			this.ToolStripMainToolBar.TabIndex = 1;
 			this.ToolStripMainToolBar.Text = "toolStrip1";
 			// 
-			// ToolStripButtonNew
-			// 
-			this.ToolStripButtonNew.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-			this.ToolStripButtonNew.Image = global::SpriteSheeter.Properties.Resources.page;
-			this.ToolStripButtonNew.ImageTransparentColor = System.Drawing.Color.Magenta;
-			this.ToolStripButtonNew.Name = "ToolStripButtonNew";
-			this.ToolStripButtonNew.Size = new System.Drawing.Size(23, 22);
-			this.ToolStripButtonNew.Text = "toolStripButton1";
-			this.ToolStripButtonNew.Click += new System.EventHandler(this.MenuItemNewSpriteSheet_Click);
-			// 
-			// ToolStripButtonOpen
-			// 
-			this.ToolStripButtonOpen.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-			this.ToolStripButtonOpen.Image = global::SpriteSheeter.Properties.Resources.folder;
-			this.ToolStripButtonOpen.ImageTransparentColor = System.Drawing.Color.Magenta;
-			this.ToolStripButtonOpen.Name = "ToolStripButtonOpen";
-			this.ToolStripButtonOpen.Size = new System.Drawing.Size(23, 22);
-			this.ToolStripButtonOpen.Text = "toolStripButton2";
-			this.ToolStripButtonOpen.Click += new System.EventHandler(this.MenuItemOpen_Click);
-			// 
-			// ToolStripButtonSave
-			// 
-			this.ToolStripButtonSave.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-			this.ToolStripButtonSave.Image = global::SpriteSheeter.Properties.Resources.disk;
-			this.ToolStripButtonSave.ImageTransparentColor = System.Drawing.Color.Magenta;
-			this.ToolStripButtonSave.Name = "ToolStripButtonSave";
-			this.ToolStripButtonSave.Size = new System.Drawing.Size(23, 22);
-			this.ToolStripButtonSave.Text = "toolStripButton3";
-			this.ToolStripButtonSave.Click += new System.EventHandler(this.MenuItemSave_Click);
-			// 
 			// toolStripSeparator2
 			// 
 			this.toolStripSeparator2.Name = "toolStripSeparator2";
 			this.toolStripSeparator2.Size = new System.Drawing.Size(6, 25);
-			// 
-			// ToolStripButtonAddSprite
-			// 
-			this.ToolStripButtonAddSprite.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-			this.ToolStripButtonAddSprite.Image = global::SpriteSheeter.Properties.Resources.picture_add;
-			this.ToolStripButtonAddSprite.ImageTransparentColor = System.Drawing.Color.Magenta;
-			this.ToolStripButtonAddSprite.Name = "ToolStripButtonAddSprite";
-			this.ToolStripButtonAddSprite.Size = new System.Drawing.Size(23, 22);
-			this.ToolStripButtonAddSprite.Text = "toolStripButton4";
-			this.ToolStripButtonAddSprite.Click += new System.EventHandler(this.MenuItemSpriteAdd_Click);
-			// 
-			// ToolStripButtonRemoveSprite
-			// 
-			this.ToolStripButtonRemoveSprite.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-			this.ToolStripButtonRemoveSprite.Image = global::SpriteSheeter.Properties.Resources.picture_delete;
-			this.ToolStripButtonRemoveSprite.ImageTransparentColor = System.Drawing.Color.Magenta;
-			this.ToolStripButtonRemoveSprite.Name = "ToolStripButtonRemoveSprite";
-			this.ToolStripButtonRemoveSprite.Size = new System.Drawing.Size(23, 22);
-			this.ToolStripButtonRemoveSprite.Text = "toolStripButton5";
-			this.ToolStripButtonRemoveSprite.Click += new System.EventHandler(this.MenuItemSpriteRemove_Click);
 			// 
 			// toolStripSeparator3
 			// 
@@ -366,18 +317,6 @@
 			this.PanelPreview.Size = new System.Drawing.Size(840, 632);
 			this.PanelPreview.TabIndex = 0;
 			// 
-			// PictureBoxPreview
-			// 
-			this.PictureBoxPreview.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-			this.PictureBoxPreview.Location = new System.Drawing.Point(0, 0);
-			this.PictureBoxPreview.Name = "PictureBoxPreview";
-			this.PictureBoxPreview.Size = new System.Drawing.Size(100, 50);
-			this.PictureBoxPreview.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
-			this.PictureBoxPreview.TabIndex = 0;
-			this.PictureBoxPreview.TabStop = false;
-			this.PictureBoxPreview.Paint += new System.Windows.Forms.PaintEventHandler(this.PictureBoxPreview_Paint);
-			this.PictureBoxPreview.MouseUp += new System.Windows.Forms.MouseEventHandler(this.PictureBoxPreview_MouseUp);
-			// 
 			// OpenFileDialogSprite
 			// 
 			this.OpenFileDialogSprite.Filter = "지원하는 모든 이미지 파일(*.png;*.bmp;*.jpg)|*.png;*.bmp;*.jpg";
@@ -391,6 +330,68 @@
 			// 
 			this.OpenFileDialogSpriteSheet.Filter = "스프라이트시트 파일(*.spsh)|*.spsh";
 			// 
+			// PictureBoxPreview
+			// 
+			this.PictureBoxPreview.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+			this.PictureBoxPreview.Location = new System.Drawing.Point(0, 0);
+			this.PictureBoxPreview.Name = "PictureBoxPreview";
+			this.PictureBoxPreview.Size = new System.Drawing.Size(100, 50);
+			this.PictureBoxPreview.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
+			this.PictureBoxPreview.TabIndex = 0;
+			this.PictureBoxPreview.TabStop = false;
+			this.PictureBoxPreview.Paint += new System.Windows.Forms.PaintEventHandler(this.PictureBoxPreview_Paint);
+			this.PictureBoxPreview.MouseUp += new System.Windows.Forms.MouseEventHandler(this.PictureBoxPreview_MouseUp);
+			// 
+			// ToolStripButtonNew
+			// 
+			this.ToolStripButtonNew.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.ToolStripButtonNew.Image = global::SpriteSheeter.Properties.Resources.page;
+			this.ToolStripButtonNew.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.ToolStripButtonNew.Name = "ToolStripButtonNew";
+			this.ToolStripButtonNew.Size = new System.Drawing.Size(23, 22);
+			this.ToolStripButtonNew.Text = "toolStripButton1";
+			this.ToolStripButtonNew.Click += new System.EventHandler(this.MenuItemNewSpriteSheet_Click);
+			// 
+			// ToolStripButtonOpen
+			// 
+			this.ToolStripButtonOpen.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.ToolStripButtonOpen.Image = global::SpriteSheeter.Properties.Resources.folder;
+			this.ToolStripButtonOpen.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.ToolStripButtonOpen.Name = "ToolStripButtonOpen";
+			this.ToolStripButtonOpen.Size = new System.Drawing.Size(23, 22);
+			this.ToolStripButtonOpen.Text = "toolStripButton2";
+			this.ToolStripButtonOpen.Click += new System.EventHandler(this.MenuItemOpen_Click);
+			// 
+			// ToolStripButtonSave
+			// 
+			this.ToolStripButtonSave.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.ToolStripButtonSave.Image = global::SpriteSheeter.Properties.Resources.disk;
+			this.ToolStripButtonSave.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.ToolStripButtonSave.Name = "ToolStripButtonSave";
+			this.ToolStripButtonSave.Size = new System.Drawing.Size(23, 22);
+			this.ToolStripButtonSave.Text = "toolStripButton3";
+			this.ToolStripButtonSave.Click += new System.EventHandler(this.MenuItemSave_Click);
+			// 
+			// ToolStripButtonAddSprite
+			// 
+			this.ToolStripButtonAddSprite.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.ToolStripButtonAddSprite.Image = global::SpriteSheeter.Properties.Resources.picture_add;
+			this.ToolStripButtonAddSprite.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.ToolStripButtonAddSprite.Name = "ToolStripButtonAddSprite";
+			this.ToolStripButtonAddSprite.Size = new System.Drawing.Size(23, 22);
+			this.ToolStripButtonAddSprite.Text = "toolStripButton4";
+			this.ToolStripButtonAddSprite.Click += new System.EventHandler(this.MenuItemSpriteAdd_Click);
+			// 
+			// ToolStripButtonRemoveSprite
+			// 
+			this.ToolStripButtonRemoveSprite.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.ToolStripButtonRemoveSprite.Image = global::SpriteSheeter.Properties.Resources.picture_delete;
+			this.ToolStripButtonRemoveSprite.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.ToolStripButtonRemoveSprite.Name = "ToolStripButtonRemoveSprite";
+			this.ToolStripButtonRemoveSprite.Size = new System.Drawing.Size(23, 22);
+			this.ToolStripButtonRemoveSprite.Text = "toolStripButton5";
+			this.ToolStripButtonRemoveSprite.Click += new System.EventHandler(this.MenuItemSpriteRemove_Click);
+			// 
 			// MainWindow
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 12F);
@@ -399,6 +400,7 @@
 			this.Controls.Add(this.SplitContainerEditor);
 			this.Controls.Add(this.ToolStripMainToolBar);
 			this.Controls.Add(this.MenuStripMainMenu);
+			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.MainMenuStrip = this.MenuStripMainMenu;
 			this.Name = "MainWindow";
 			this.Text = "Untitled.spsh - Sprite Sheeter";
