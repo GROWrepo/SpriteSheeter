@@ -10,6 +10,9 @@ using SixLabors.ImageSharp.Memory;
 using SixLabors.ImageSharp.Metadata;
 using SixLabors.ImageSharp.Formats;
 using SixLabors.ImageSharp.ColorSpaces;
+using System.IO;
+using System.Text;
+using System.Diagnostics;
 
 namespace SpriteSheeter
 {
@@ -254,6 +257,41 @@ namespace SpriteSheeter
 			}
 
 			return spriteSheet;
+		}
+
+		public bool Export (string targetPath, string name)
+		{
+			using (Image generated = GenerateSpriteSheet ())
+			{
+				generated.Save (Path.Combine (targetPath, $"{name}.png"), new SixLabors.ImageSharp.Formats.Png.PngEncoder ()
+				{
+					BitDepth = SixLabors.ImageSharp.Formats.Png.PngBitDepth.Bit8,
+					ColorType = SixLabors.ImageSharp.Formats.Png.PngColorType.RgbWithAlpha,
+					FilterMethod = SixLabors.ImageSharp.Formats.Png.PngFilterMethod.Adaptive,
+					InterlaceMethod = SixLabors.ImageSharp.Formats.Png.PngInterlaceMode.None,
+				});
+			}
+
+			using (Stream outputStream = new FileStream (Path.Combine (targetPath, $"{name}.json"), FileMode.Create))
+			{
+				using (StreamWriter writer = new StreamWriter (outputStream, Encoding.UTF8))
+				{
+					writer.WriteLine ("{");
+					foreach (var item in items)
+					{
+						var area = item.SheetArea;
+						var message = $"INFO: {item.Name}: {area}";
+						Console.WriteLine (message);
+						Debug.WriteLine (message);
+						writer.WriteLine ($"\t\"{item.Name}\" : \"{area.X},{area.Y},{area.Width},{area.Height}\"{((item.Name != items [items.Count - 1].Name) ? "," : "")}");
+					}
+
+					writer.WriteLine ("}");
+					writer.Flush ();
+				}
+			}
+
+			return true;
 		}
 	}
 }

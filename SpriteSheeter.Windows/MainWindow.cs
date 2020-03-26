@@ -31,7 +31,7 @@ namespace SpriteSheeter
 			{
 				if (isDirty)
 				{
-					switch (MessageBox.Show ("저장하시겠습니까?", "스프라이트 시터", MessageBoxButtons.YesNoCancel))
+					switch (MessageBox.Show ("저장하시겠습니까?", "Sprite Sheeter", MessageBoxButtons.YesNoCancel))
 					{
 						case DialogResult.Yes: return Save ();
 						case DialogResult.No: return true;
@@ -81,6 +81,8 @@ namespace SpriteSheeter
 			isDirty = false;
 			savepath = OpenFileDialogSpriteSheet.FileName;
 
+			Text = $"{Path.GetFileName(savepath)} - Sprite Sheeter";
+
 			spriteSheet.Refresh ();
 			var spriteSheetImage = spriteSheet.GenerateSpriteSheet ();
 			PictureBoxPreview.Image = ImageHelper.Convert (spriteSheetImage);
@@ -97,17 +99,19 @@ namespace SpriteSheeter
 					savepath = SaveFileDialogSpriteSheet.FileName;
 				}
 
+				var pngEncoder = new SixLabors.ImageSharp.Formats.Png.PngEncoder ()
+				{
+					BitDepth = SixLabors.ImageSharp.Formats.Png.PngBitDepth.Bit8,
+					ColorType = SixLabors.ImageSharp.Formats.Png.PngColorType.RgbWithAlpha,
+					FilterMethod = SixLabors.ImageSharp.Formats.Png.PngFilterMethod.Adaptive,
+					InterlaceMethod = SixLabors.ImageSharp.Formats.Png.PngInterlaceMode.None,
+				};
+
 				List<FileItem> fileItems = new List<FileItem> ();
 				foreach (var item in spriteSheet.Items)
 				{
 					MemoryStream imageData = new MemoryStream ();
-					item.Sprite.Save (imageData, new SixLabors.ImageSharp.Formats.Png.PngEncoder ()
-					{
-						BitDepth = SixLabors.ImageSharp.Formats.Png.PngBitDepth.Bit8,
-						ColorType = SixLabors.ImageSharp.Formats.Png.PngColorType.RgbWithAlpha,
-						FilterMethod = SixLabors.ImageSharp.Formats.Png.PngFilterMethod.Adaptive,
-						InterlaceMethod = SixLabors.ImageSharp.Formats.Png.PngInterlaceMode.None,
-					});
+					item.Sprite.Save (imageData, pngEncoder);
 
 					var fileItem = new FileItem ();
 					fileItem.Name = item.Name;
@@ -126,6 +130,7 @@ namespace SpriteSheeter
 					}
 				}
 
+				Text = $"{Path.GetFileName (savepath)} - Sprite Sheeter";
 				isDirty = false;
 			}
 			return true;
@@ -141,6 +146,15 @@ namespace SpriteSheeter
 
 			ComboBoxMaximumSize.Text = spriteSheet.MaximumSize.ToString ();
 			ListViewSprites.SmallImageList = new ImageList ();
+		}
+
+		private void MainWindow_FormClosing (object sender, FormClosingEventArgs e)
+		{
+			if (!IsSaved)
+			{
+				e.Cancel = true;
+				return;
+			}
 		}
 
 		private void AddSprite (string filename)
@@ -162,6 +176,8 @@ namespace SpriteSheeter
 
 			isDirty = false;
 			savepath = null;
+
+			Text = "Untitled.spsh - Sprite Sheeter";
 
 			spriteSheet.Refresh ();
 			var spriteSheetImage = spriteSheet.GenerateSpriteSheet ();
@@ -187,7 +203,13 @@ namespace SpriteSheeter
 
 		private void MenuItemExport_Click (object sender, EventArgs e)
 		{
+			if (FolderBrowserDialogExport.ShowDialog (this) == DialogResult.Cancel)
+				return;
 
+			spriteSheet.Export (
+				FolderBrowserDialogExport.SelectedPath,
+				!string.IsNullOrEmpty (savepath) ? Path.GetFileNameWithoutExtension (savepath) : "Untitled"
+			);
 		}
 
 		private void MenuItemExit_Click (object sender, EventArgs e)
